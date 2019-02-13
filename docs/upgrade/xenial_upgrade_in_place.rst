@@ -213,14 +213,82 @@ configuration:
 You will be prompted for the admin user's passphrase on the servers. Type it in
 and press Enter.
 
-Test the instance after upgrading
----------------------------------
+Perform additional tests
+------------------------
+While we have extensively tested the upgrade on recommended hardware, we
+recommend performing the following tests yourself to identify potential issues
+specific to your system configuration.
 
-[ TBD - either a bunch of shell commands that check installed versions and stuff
-like grsec and Apparmor, or a single script provided with the release to do
-basic server tests ]
+On the *Application* and *Monitor Server*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+As with previous commands, run ``ssh app`` on your *Admin Workstation* to log
+into your *Application Server*, and use ``ssh mon`` to log into your *Monitor
+Server*.
 
-[ Also a checklist for basic functionality - connectivity to the 4 services, and
-a run through the submission-to-decryption workflow ]
+- Verify that you are running the grsecurity-hardened kernel by running the
+  command ``uname -r``. The output should be ``4.4.162-grsec``, unless you have
+  explicitly downgraded your kernel version.
 
-[ Anything else? ]
+- Verify that no packages for the previous LTS release of Ubuntu are available
+  or installed. The output of ``apt-cache policy ".*" | grep "trusty/"`` should
+  be empty (this command will take a few seconds to complete). .
+  **[ED: Is this useful? Is there a scenario in which it would return non-empty
+  results?]**
+
+End-to-end test
+^^^^^^^^^^^^^^^
+We recommend an end-to-end test of document submission, reply and decryption.
+First, confirm that you can log into the *Journalist Interface*. On the Tails
+desktop, you should find a shortcut called **SecureDrop Journalist Interface**.
+Double-click it to launch the Tor browser.
+
+Once the page has finished loading, sign in using your SecureDrop login
+credentials. Confirm that you can view the list of submissions as expected.
+
+Keep the browser window open, and launch the **SecureDrop Source Interface**
+using its shortcut on the Tails desktop. The *Source Interface* should load in
+another browser tab.
+
+Once the page has finished loading, click **Submit Documents**. On the subsequent
+page, click **Submit Documents** again (you may want to write down your codename
+in case you need it for further testing).On the following screen, choose a
+simple file to upload, and enter a message to go along with it, then press
+**Submit**.
+
+Switch to the tab with the *Journalist Interface*, reload it, and confirm that
+you can see your new submission. Write a reply, and switch back to the
+*Source Interface*. Reload it, and confirm that you can see the reply.
+
+Now, from the *Journalist Interface*, download the submission you just made.
+Copy it to your *Transfer Device* and boot into your *Secure Viewing Station*.
+Confirm that you can open the encrypted document.
+
+Just in case you picked the wrong submission, you may want to follow standard
+precautions, e.g., do not open the document directly from the *Transfer Device*
+but copy it onto the *Secure Viewing Station* first.
+
+Scratchpad
+^^^^^^^^^^
+Consider
+
+- shell commands that check installed versions and stuff like grsec and
+  Apparmor, or a single script provided with the release to do
+  basic server tests
+- checklist for additional functionality, connectivity checks
+- anything else?
+
+Contact us
+==========
+If you have questions or comments regarding this process, or if you
+encounter any issues, you can always contact us by the following means:
+
+- via our `Support Portal <https://support.freedom.press>`_, if you are a member
+  (membership is approved on a case-by-case basis);
+- via securedrop@freedom.press
+  (`GPG encrypted <https://securedrop.org/sites/default/files/fpf-email.asc>`__)
+  for sensitive security issues (please use judiciously);
+- via our `community forums <https://forum.securedrop.org>`_.
+
+If you encounter problems that are not security-sensitive, we also encourage you
+to `file an issue <https://github.com/freedomofpress/securedrop/issues/new/>`
+in our public GitHub repository.
