@@ -17,6 +17,15 @@
   tags:
     - reboot
 
+- name: Clear out SSH sessions, to prevent reuse of stale ControlPersist file.
+  local_action:
+    module: file
+    args:
+      path: /home/amnesia/.ansible/cp
+      state: absent
+  run_once: yes
+  become: no
+
 - name: Wait for server to come back.
   local_action: wait_for
   args:
