@@ -16,8 +16,35 @@ set -x
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+
+# Manage PaX flags for ossec server executables.
+# paxctld will already be present on Xenial due to apt dependencies,
+# then we substitute the config inline
+
+add_ossec_paxctld_config_line() {
+    paxctld_config="/etc/paxctld.conf"
+    if ! grep -q "^$1" "$paxctld_config"; then
+        printf '%s\t%s\n' "/var/ossec/bin/$1" "$2" >> "$paxctld_config"
+    fi
+}
+    
+
+set_paxctld_config() {
+    paxctld_config="/etc/paxctld.conf"
+    if [ -f "$paxctld_config" ]; then
+        add_ossec_paxctld_config_line "ossec-maild" "m"
+        add_ossec_paxctld_config_line "ossec-logtest" "m"
+        add_ossec_paxctld_config_line "ossec-analysisd" "m"
+        add_ossec_paxctld_config_line "ossec-syscheckd" "m"
+        systemctl enable paxctld
+        systemctl start paxctld
+    fi
+}
 case "$1" in
     configure)
+
+        set_paxctld_config
+
         GROUP="ossec"
         OSSEC_HOME="/var/ossec"
 

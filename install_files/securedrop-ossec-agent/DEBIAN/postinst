@@ -16,8 +16,27 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+add_ossec_paxctld_config_line() {
+    paxctld_config="/etc/paxctld.conf"
+    if ! grep -q "^$1" "$paxctld_config"; then
+        printf '%s\t%s\n' "/var/ossec/bin/$1" "$2" >> "$paxctld_config"
+    fi
+}
+    
+
+set_paxctld_config() {
+    paxctld_config="/etc/paxctld.conf"
+    if [ -f "$paxctld_config" ]; then
+        add_ossec_paxctld_config_line "ossec-syscheckd" "m"
+        add_ossec_paxctld_config_line "ossec-agentd" "m"
+        systemctl enable paxctld
+        systemctl start paxctld
+    fi
+}
+
 case "$1" in
     configure)
+        set_paxctld_config
 	    # Replace monitor server domain name by ip address due to
 	    #  https://github.com/ossec/ossec-hids/issues/1145
 	    mon_ip=$(grep -oP "^\\d+\.\\d+\.\\d+\.\\d+(?=.*securedrop-monitor-server-alias)" /etc/hosts)
