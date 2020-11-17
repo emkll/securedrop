@@ -61,7 +61,7 @@ function docker_run() {
 
     # If this is a CI run, pass CodeCov settings into the container.
     if [ -n "${CIRCLE_BRANCH:-}" ] ; then
-        ci_env=`bash <(curl -s https://codecov.io/env)`
+        ci_env=$(bash <(curl -s https://codecov.io/env))
     else
         ci_env=""
     fi
