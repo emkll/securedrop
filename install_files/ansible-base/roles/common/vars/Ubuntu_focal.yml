@@ -11,7 +11,5 @@ securedrop_common_packages:
   - aptitude
   - iptables-persistent
   - unattended-upgrades
-  - ntp
-  - ntpdate
   - resolvconf
   - tmux
