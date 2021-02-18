@@ -67,7 +67,9 @@ class TestSecureDropAdmin(object):
         """
         with mock.patch(
             "securedrop_admin.check_for_updates", side_effect=[[False, "1.5.0"]]
-        ) as mocked_check, mock.patch("sys.exit") as mocked_exit:
+        ) as mocked_check, mock.patch(
+            "securedrop_admin.get_git_branch", side_effect=["develop"]
+        ), mock.patch("sys.exit") as mocked_exit:
             # The decorator itself interprets --force
             args = argparse.Namespace(force=False)
             rv = securedrop_admin.update_check_required("update_check_test")(
@@ -85,11 +87,14 @@ class TestSecureDropAdmin(object):
           And an update is required
         Then the update check should run to completion
           And an error referencing the command should be displayed
+          And the current branch state should be included in the output
           And the program should exit
         """
         with mock.patch(
             "securedrop_admin.check_for_updates", side_effect=[[True, "1.5.0"]]
-        ) as mocked_check, mock.patch("sys.exit") as mocked_exit:
+        ) as mocked_check, mock.patch(
+            "securedrop_admin.get_git_branch", side_effect=["bad_branch"]
+        ), mock.patch("sys.exit") as mocked_exit:
             # The decorator itself interprets --force
             args = argparse.Namespace(force=False)
             securedrop_admin.update_check_required("update_check_test")(
@@ -98,6 +103,7 @@ class TestSecureDropAdmin(object):
             assert mocked_check.called
             assert mocked_exit.called
             assert "update_check_test" in caplog.text
+            assert "bad_branch" in caplog.text
 
     def test_update_check_decorator_when_skipped(self, caplog):
         """
@@ -110,7 +116,9 @@ class TestSecureDropAdmin(object):
         """
         with mock.patch(
             "securedrop_admin.check_for_updates", side_effect=[[True, "1.5.0"]]
-        ) as mocked_check, mock.patch("sys.exit") as mocked_exit:
+        ) as mocked_check, mock.patch(
+            "securedrop_admin.get_git_branch", side_effect=["develop"]
+        ), mock.patch("sys.exit") as mocked_exit:
             # The decorator itself interprets --force
             args = argparse.Namespace(force=True)
             rv = securedrop_admin.update_check_required("update_check_test")(
